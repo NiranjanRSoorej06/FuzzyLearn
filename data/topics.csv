@@ -1,0 +1,13 @@
+course,topic,failure_rate,confusion,resource_inadequacy,barrier_type,source
+Data Structures,Recursion,65,82,90,visualization,synthetic
+Data Structures,Graph algorithms,48,70,75,application,synthetic
+Data Structures,Dynamic programming,60,78,80,process_demo,synthetic
+Data Structures,Sorting,20,30,35,unclear_explanation,synthetic
+Data Structures,Trees,55,60,45,visualization,synthetic
+Data Structures,Hashing,70,50,30,application,synthetic
+Data Structures,Linked lists,15,20,10,navigation,synthetic
+Data Structures,Heaps,40,45,60,self_check,synthetic
+Data Structures,Stacks and queues,25,35,25,unclear_explanation,synthetic
+Data Structures,Graph traversal,80,85,95,relationships,synthetic
+Data Structures,Binary search,10,15,10,self_check,synthetic
+Data Structures,Complexity analysis,5,10,5,navigation,synthetic
