@@ -21,9 +21,7 @@ GRID = np.arange(0, 101, 1, dtype=float)
 
 
 def _as_array(x):
-    arr = np.asarray(x, dtype=float)
-    scalar = np.isscalar(x)
-    return arr, scalar
+    return np.asarray(x, dtype=float), np.ndim(x) == 0
 
 
 def trapmf(x, a, b, c, d):
@@ -41,9 +39,7 @@ def trapmf(x, a, b, c, d):
     r[arr < a] = 0.0
     r[arr > d] = 0.0
     r = np.clip(r, 0.0, 1.0)
-    if scalar:
-        return float(r.reshape(-1)[0]) if r.size == 1 else r.item() if r.ndim == 0 else r
-    return r
+    return float(r) if scalar else r
 
 
 def _membership_value(name, value, params):
@@ -120,33 +116,39 @@ def defuzzify(aggregated):
     return float(np.sum(GRID * agg) / denom)
 
 
-def _label_for_score(score, mems=None):
-    # Evaluate output membership functions at the crisp score.
+def _label_for_score(score):
+    """Label by output-set membership degree at the crisp score.
+
+    Ties are broken deterministically toward the higher-priority set
+    (later in OUTPUT_SETS), which is documented in the README.
+    """
     candidates = []
     for name in OUTPUT_SETS:
         a, b, c, d = OUTPUT_PARAMS[name]
-        m = float(trapmf(score, a, b, c, d))
-        candidates.append((name, m))
-    best_score = max(m for _, m in candidates)
-    # tie-break: later (higher priority) label
-    best_name = None
+        candidates.append((name, float(trapmf(score, a, b, c, d))))
+    best = max(m for _, m in candidates)
+    best_name = "Medium"
     for name, m in candidates:
-        if m == best_score:
+        if m == best:
             best_name = name
-    # ensure deterministic tie-break toward higher priority by scanning in order
-    best_name = None
-    for name, m in candidates:
-        if m == best_score:
-            if best_name is None:
-                best_name = name
-            else:
-                # prefer later in OUTPUT_SETS
-                if OUTPUT_SETS.index(name) > OUTPUT_SETS.index(best_name):
-                    best_name = name
-    return best_name if best_name is not None else "Medium"
+    return best_name
+
+
+def _check_range(value, name):
+    try:
+        v = float(value)
+    except (TypeError, ValueError):
+        raise ValueError("%s must be a number, got %r" % (name, value))
+    if not (0.0 <= v <= 100.0):
+        raise ValueError("%s must be in [0, 100], got %r" % (name, value))
+    return v
 
 
 def priority(F, C, R):
+    """Return score, label, memberships and fired-rule details for one topic."""
+    F = _check_range(F, "failure_rate")
+    C = _check_range(C, "confusion")
+    R = _check_range(R, "resource_inadequacy")
     res = infer(F, C, R)
     score = defuzzify(res["aggregated"])
     score = float(np.clip(score, 0.0, 100.0))

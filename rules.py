@@ -63,5 +63,3 @@ def validate_rules(rules):
         return False, "rule set does not cover all 27 combinations"
     return True, "ok"
 
-
-assert validate_rules(RULES)[0], validate_rules(RULES)[1]
