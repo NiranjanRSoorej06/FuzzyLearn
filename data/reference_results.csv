@@ -1,0 +1,11 @@
+alt_id,topic,TOPSIS_crisp,rank_crisp,Chen_degenerate,rank_chen_deg,Chen_fuzzy,rank_chen_fuzzy,baseline_sum,rank_sum,rank_difficulty_only,Mamdani,rank_mamdani
+A1,"Recursion, tracing and designing",0.632,2,0.1939,2,0.1828,2,0.7146,2,1,92.0,1
+A2,"Memory model, references, pointers",0.4793,7,0.1528,8,0.1423,8,0.471,7,3,57.9,7
+A3,Recursive algorithms,0.3226,9,0.1318,9,0.1242,9,0.2922,9,6,37.9,9
+A4,Recurrence relations,0.4788,8,0.1724,5,0.162,5,0.4695,8,8,79.7,2
+A5,Order of growth,0.5129,5,0.1643,7,0.1538,7,0.5155,5,5,69.0,5
+A6,Algorithm analysis,0.4831,6,0.1773,3,0.1702,3,0.4778,6,9,56.4,8
+A7,Algorithm correctness,0.3022,10,0.1229,10,0.1172,10,0.2101,10,4,25.0,10
+A8,Recursive definitions,0.5343,3,0.1688,6,0.1577,6,0.5433,3,7,70.0,4
+A9,Abstraction / pattern recognition and use,0.872,1,0.2369,1,0.2246,1,0.9137,1,2,79.7,2
+A10,Primitive vs. reference variables,0.5145,4,0.1743,4,0.1623,4,0.5218,4,10,61.0,6

@@ -3,3 +3,7 @@ __pycache__/
 .pytest_cache/
 .streamlit/
 reports/
+.agents/
+.claude/
+pip_install.log
+CONTRIBUTIONS.md

@@ -30,12 +30,135 @@ from evaluation import (
     monotonicity_report, ranking_comparison, worked_example_report,
 )
 
+from topsis import (
+    load_actions, equal_weights, critic_weights, topsis_crisp, rank_desc,
+    spearman, top_overlap,
+)
+from fuzzy_topsis import degenerate, topsis_chen
+from mamdani_adapter import score_actions as mamdani_score_actions
+
 st.set_page_config(page_title="FuzzyLearn", layout="wide")
 st.title("FuzzyLearn — Teaching-Resource Prioritization")
 st.caption(
     "Explainable Mamdani fuzzy decision support. Suggested improvements are "
     "recommendations, not guaranteed solutions; instructors keep final authority."
 )
+
+TOPSIS_CRITERIA = ["difficulty", "importance", "resource_gap", "effort_hours"]
+TOPSIS_BENEFIT = [True, True, True, False]
+TOPSIS_SCENARIOS = {
+    "equal": None,
+    "difficulty-heavy": [0.4, 0.2, 0.2, 0.2],
+    "importance-heavy": [0.2, 0.4, 0.2, 0.2],
+    "resource-heavy": [0.2, 0.2, 0.4, 0.2],
+    "effort-heavy": [0.2, 0.2, 0.2, 0.4],
+    "CRITIC": None,
+}
+
+
+def _topsis_matrices(actions_df):
+    Xc = actions_df[["diff_c", "imp_c", "resource_gap", "effort_hours"]].to_numpy(dtype=float)
+    T = np.stack(
+        [
+            actions_df[["diff_l", "diff_c", "diff_u"]].to_numpy(dtype=float),
+            actions_df[["imp_l", "imp_c", "imp_u"]].to_numpy(dtype=float),
+            np.repeat(actions_df[["resource_gap"]].to_numpy(dtype=float), 3, axis=1),
+            np.repeat(actions_df[["effort_hours"]].to_numpy(dtype=float), 3, axis=1),
+        ],
+        axis=1,
+    )
+    return Xc, T
+
+
+def _topsis_ranking(actions_df, Xc, T, w):
+    cc_crisp, R, V, dp, dm = topsis_crisp(Xc, w, TOPSIS_BENEFIT)
+    cc_fuzzy, *_ = topsis_chen(T, w, TOPSIS_BENEFIT)
+    mam = mamdani_score_actions(actions_df)
+    out = actions_df[["alt_id", "topic", "action", "data_status"]].copy()
+    out["topsis_crisp_score"] = cc_crisp.round(4)
+    out["topsis_crisp_rank"] = rank_desc(cc_crisp)
+    out["chen_fuzzy_score"] = cc_fuzzy.round(4)
+    out["chen_fuzzy_rank"] = rank_desc(cc_fuzzy)
+    out["mamdani_score"] = mam.round(1)
+    out["mamdani_rank"] = rank_desc(mam)
+    return out, dict(cc_crisp=cc_crisp, R=R, V=V, dp=dp, dm=dm, cc_fuzzy=cc_fuzzy, mam=mam)
+
+
+# --------------------------------------------------------------------- TOPSIS section
+st.header("TOPSIS prioritisation")
+st.warning(
+    "**Synthetic-anchored data — illustrative only, not a recommendation for "
+    "a real course.** Difficulty/importance are published Delphi ratings "
+    "(Goldman et al. 2008, a CS1/discrete-maths panel, not Data Structures "
+    "students); resource gap and effort are seeded synthetic draws (seed 2026)."
+)
+
+try:
+    actions_df = load_actions("data/actions.csv")
+except (FileNotFoundError, ValueError) as e:
+    st.error("Could not load data/actions.csv: %s" % e)
+    actions_df = None
+
+if actions_df is not None:
+    Xc, T = _topsis_matrices(actions_df)
+    w_eq = equal_weights(len(TOPSIS_CRITERIA))
+    TOPSIS_SCENARIOS["equal"] = w_eq
+    TOPSIS_SCENARIOS["CRITIC"] = critic_weights(Xc, TOPSIS_BENEFIT)
+
+    scenario_name = st.selectbox("Weight scenario", list(TOPSIS_SCENARIOS.keys()))
+    w = TOPSIS_SCENARIOS[scenario_name]
+    st.caption("Weights (difficulty, importance, resource_gap, effort_hours): %s" % np.round(w, 4).tolist())
+
+    ranking, scores = _topsis_ranking(actions_df, Xc, T, w)
+
+    st.subheader("Ranked actions")
+    st.dataframe(
+        ranking.sort_values("topsis_crisp_rank")[
+            ["alt_id", "topic", "action", "topsis_crisp_score", "topsis_crisp_rank",
+             "chen_fuzzy_score", "chen_fuzzy_rank", "mamdani_score", "mamdani_rank",
+             "data_status"]
+        ],
+        use_container_width=True,
+    )
+
+    st.subheader("Ranked closeness chart")
+    st.bar_chart(ranking.set_index("alt_id")["topsis_crisp_score"])
+    st.caption("Crisp TOPSIS closeness coefficient by action (synthetic-anchored data).")
+
+    st.subheader("Comparisons")
+    cmp_rows = [
+        ("crisp vs Chen fuzzy", scores["cc_crisp"], scores["cc_fuzzy"]),
+        ("crisp vs Mamdani", scores["cc_crisp"], scores["mam"]),
+        ("Chen fuzzy vs Mamdani", scores["cc_fuzzy"], scores["mam"]),
+    ]
+    cmp_df = pd.DataFrame(
+        [{"comparison": n, "spearman_rho": round(spearman(a, b), 4), "top3_overlap": top_overlap(a, b)}
+         for n, a, b in cmp_rows]
+    )
+    st.dataframe(cmp_df, use_container_width=True)
+    st.caption(
+        "A ranking is not a probability; agreement between methods does not "
+        "prove correctness. On this matrix crisp TOPSIS = equal-weight sum "
+        "(see topsis_evaluation.py)."
+    )
+
+    st.subheader("A1 step-by-step calculation")
+    with st.expander("Normalised row, weighted row, D+, D-, closeness for A1"):
+        a1_idx = actions_df.index[actions_df["alt_id"] == "A1"][0]
+        st.write("Normalised row r (benefit/cost oriented):", dict(zip(TOPSIS_CRITERIA, scores["R"][a1_idx].round(4))))
+        st.write("Weighted row v = w·r:", dict(zip(TOPSIS_CRITERIA, scores["V"][a1_idx].round(4))))
+        st.write("D+ = %.4f, D- = %.4f" % (scores["dp"][a1_idx], scores["dm"][a1_idx]))
+        st.write("Closeness C = D-/(D+ + D-) = %.4f" % scores["cc_crisp"][a1_idx])
+
+    st.subheader("CSV export")
+    topsis_csv = ranking.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        "Download TOPSIS ranking CSV", data=topsis_csv,
+        file_name="topsis_ranking.csv", mime="text/csv",
+    )
+
+st.divider()
+st.header("Comparison method: Mamdani FIS")
 
 
 def mf_plot(params, sets):

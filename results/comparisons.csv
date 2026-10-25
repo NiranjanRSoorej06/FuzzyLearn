@@ -1,0 +1,8 @@
+comparison,spearman_rho,top3_overlap
+crisp vs Chen-degenerate,0.8061,2
+Chen-degenerate vs Chen-fuzzy (extension),1.0,3
+crisp vs Chen-fuzzy,0.8061,2
+crisp vs equal-weight sum,1.0,3
+crisp vs difficulty-only,0.2485,2
+crisp vs Mamdani,0.7416,2
+Chen-fuzzy vs Mamdani,0.7112,2

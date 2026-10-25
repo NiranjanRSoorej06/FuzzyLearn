@@ -1,0 +1,3 @@
+ranked_closeness.png -- Ranked crisp TOPSIS closeness coefficients for the 10 improvement actions, equal weights (synthetic-anchored data).
+sensitivity_heatmap.png -- Crisp TOPSIS rank of each action across six weight scenarios (equal, difficulty-heavy, importance-heavy, resource-heavy, effort-heavy, CRITIC) (synthetic-anchored data).
+fuzzy_vs_degenerate.png -- Chen (2000) fuzzy TOPSIS closeness compared with the degenerate (crisp-as-fuzzy) baseline, equal weights (synthetic-anchored data).

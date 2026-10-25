@@ -1,0 +1,11 @@
+alt_id,topic,action,data_status,topsis_crisp_score,topsis_crisp_rank,chen_degenerate_score,chen_degenerate_rank,chen_fuzzy_score,chen_fuzzy_rank,equal_weight_sum_score,equal_weight_sum_rank,difficulty_only_rank,mamdani_score,mamdani_rank
+A1,"Recursion, tracing and designing","Interactive visualization or animation - Recursion, tracing and designing",synthetic-anchored,0.632,2,0.1939,2,0.1828,2,0.7146,2,1,92.0,1
+A2,"Memory model, references, pointers","Interactive visualization or animation - Memory model, references, pointers",synthetic-anchored,0.4793,7,0.1528,8,0.1423,8,0.471,7,3,57.9,7
+A3,Recursive algorithms,Worked examples and graded practice - Recursive algorithms,synthetic-anchored,0.3226,9,0.1318,9,0.1242,9,0.2922,9,6,37.9,9
+A4,Recurrence relations,Revised notes and step-by-step explanations - Recurrence relations,synthetic-anchored,0.4788,8,0.1724,5,0.162,5,0.4695,8,8,79.7,2
+A5,Order of growth,Revised notes and step-by-step explanations - Order of growth,synthetic-anchored,0.5129,5,0.1643,7,0.1538,7,0.5155,5,5,69.0,5
+A6,Algorithm analysis,Short instructional video - Algorithm analysis,synthetic-anchored,0.4831,6,0.1773,3,0.1702,3,0.4778,6,9,56.4,8
+A7,Algorithm correctness,Self-assessment quiz with explanations - Algorithm correctness,synthetic-anchored,0.3022,10,0.1229,10,0.1172,10,0.2101,10,4,25.0,10
+A8,Recursive definitions,Concept map or diagram - Recursive definitions,synthetic-anchored,0.5343,3,0.1688,6,0.1577,6,0.5433,3,7,70.0,4
+A9,Abstraction / pattern recognition and use,Worked examples and graded practice - Abstraction / pattern recognition and use,synthetic-anchored,0.872,1,0.2369,1,0.2246,1,0.9137,1,2,79.7,2
+A10,Primitive vs. reference variables,Self-assessment quiz with explanations - Primitive vs. reference variables,synthetic-anchored,0.5145,4,0.1743,4,0.1623,4,0.5218,4,10,61.0,6
