@@ -7,8 +7,11 @@ Status key used throughout:
 - **TO VERIFY** = something you must confirm yourselves against the original source before submitting.
 
 > The dataset is **synthetic-anchored**: two of the four criteria use published
-> expert ratings; the other two are seeded synthetic values. Every file, table,
-> figure caption and the README must say so. Do not call it "real".
+> expert ratings; the other two are seeded synthetic values. Do not call it
+> "real". The action input and per-action ranking include `data_status`; the
+> evaluation console, dashboard warning, and figure captions identify the
+> analysis as synthetic-anchored. The comparison and sensitivity CSVs do not
+> currently include a separate provenance field.
 
 ---
 
